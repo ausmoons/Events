@@ -20,7 +20,16 @@ def events(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     if request.method == 'GET':
-        events = Event.objects.all().order_by('id')
+        event_type = request.query_params.get('type')
+        if event_type:
+            if event_type not in ['PushEvent', 'ReleaseEvent', 'WatchEvent']:
+                return Response(
+                    {"type": ["Select a valid choice. {} is not one of the available choices.".format(event_type)]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            events = Event.objects.filter(type=event_type).order_by('id')
+        else:
+            events = Event.objects.all().order_by('id')
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -32,26 +41,6 @@ def retrieve_event_by_id(request, event_id):
     except Event.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     serializer = EventSerializer(event)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-@api_view(['GET'])
-def retrieve_events_by_type(request):
-    event_type = request.query_params.get('type')
-    logger.debug("retrieve_events_by_type called with type: %s", event_type)
-    valid_event_types = ['PushEvent', 'ReleaseEvent', 'WatchEvent']
-
-    if event_type not in valid_event_types:
-        logger.warning("Invalid event type: %s", event_type)
-        return Response(
-            {"type": ["Select a valid choice. {} is not one of the available choices.".format(event_type)]},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    logger.debug("Chosen type: %s", event_type)
-    events = Event.objects.filter(type=event_type).order_by('id')
-    logger.debug("Events after filtering: %s", list(events))
-    serializer = EventSerializer(events, many=True)
-    logger.debug("Serialized data: %s", serializer.data)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])

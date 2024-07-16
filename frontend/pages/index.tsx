@@ -1,5 +1,3 @@
-// frontend/pages/index.tsx
-
 import React from 'react';
 import EventsPage from './events';
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AddEventModal from '../components/AddEventModal';
+import EventList from '../components/EventList';
 import { CustomEvent } from '../types/CustomEvent';
 
 const EventsPage = () => {
@@ -12,21 +13,18 @@ const EventsPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchEvents = async (url: string, isInitialFetch = false) => {
-    console.log(`Fetching events from ${url}`);
     try {
       const response = await fetch(url);
       const data = await response.json();
-      console.log('Fetched events:', data);
 
       if (isInitialFetch) {
         setAllEvents(data);
       }
-
       setFilteredEvents(data);
       setLoading(false);
     } catch (fetchError) {
-      console.error('Error fetching events:', fetchError);
       setLoading(false);
+      console.error('Error fetching events:', fetchError);
     }
   };
 
@@ -35,10 +33,7 @@ const EventsPage = () => {
   }, []);
 
   useEffect(() => {
-    console.log('Filter type or value changed:', { filterType, filterValue });
-
     if (!filterType || filterValue === '') {
-      console.log('No filter or empty filter value, showing all events');
       setFilteredEvents(allEvents);
       setError(null);
       return;
@@ -62,7 +57,6 @@ const EventsPage = () => {
   }, [filterType, filterValue, allEvents]);
 
   const handleFilterTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log('Filter type changed:', e.target.value);
     setFilterType(e.target.value);
     setFilterValue('');
     setError(null);
@@ -73,10 +67,8 @@ const EventsPage = () => {
   ) => {
     const value = e.target.value;
     setError(null);
-    console.log('Filter value changed:', value);
 
     if (value === '') {
-      console.log('Empty filter value, resetting to all events');
       setFilterValue('');
       setFilteredEvents(allEvents);
       return;
@@ -86,7 +78,6 @@ const EventsPage = () => {
       (filterType === 'user' || filterType === 'repo') &&
       isNaN(Number(value))
     ) {
-      console.log('Invalid filter value, must be a number');
       setError('Repo ID and User ID must be numbers.');
       setFilteredEvents(allEvents);
       return;
@@ -95,7 +86,7 @@ const EventsPage = () => {
     setFilterValue(value);
   };
 
-  const handleAddEvent = async (newEvent: Omit<Event, 'id'>) => {
+  const handleAddEvent = async (newEvent: Omit<CustomEvent, 'id'>) => {
     try {
       const response = await fetch('http://localhost:8000/events/', {
         method: 'POST',
@@ -104,13 +95,14 @@ const EventsPage = () => {
         },
         body: JSON.stringify(newEvent),
       });
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Error:', errorData.error || 'Failed to create event');
         return;
       }
+
       const createdEvent = await response.json();
-      console.log('Event created:', createdEvent);
       setAllEvents([...allEvents, createdEvent]);
       setFilteredEvents([...allEvents, createdEvent]);
     } catch (addEventError) {
@@ -157,10 +149,9 @@ const EventsPage = () => {
       </div>
       {filterType && (
         <div className="mb-4">
-          <label
-            htmlFor="filterValue"
-            className="block text-gray-700 mb-2"
-          >{`Enter ${filterType === 'type' ? 'Event Type' : filterType === 'user' ? 'User ID' : 'Repo ID'}`}</label>
+          <label htmlFor="filterValue" className="block text-gray-700 mb-2">
+            {`Enter ${filterType === 'type' ? 'Event Type' : filterType === 'user' ? 'User ID' : 'Repo ID'}`}
+          </label>
           {filterType === 'type' ? (
             <select
               data-cy="filter-value-select"
@@ -187,34 +178,7 @@ const EventsPage = () => {
           {error && <div className="text-red-500 mt-2">{error}</div>}
         </div>
       )}
-      {filteredEvents.length === 0 ? (
-        <div className="text-center text-gray-700">
-          No events found for the selected filter.
-        </div>
-      ) : (
-        <ul className="space-y-4">
-          {filteredEvents.map((event) => (
-            <li
-              key={event.id}
-              data-cy="event-item"
-              className="p-4 bg-white rounded-md shadow-md"
-            >
-              <div>
-                <strong>Type:</strong> {event.type}
-              </div>
-              <div>
-                <strong>Public:</strong> {event.public ? 'Yes' : 'No'}
-              </div>
-              <div>
-                <strong>Repo ID:</strong> {event.repo_id}
-              </div>
-              <div>
-                <strong>Actor ID:</strong> {event.actor_id}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+      <EventList events={filteredEvents} />
     </div>
   );
 };

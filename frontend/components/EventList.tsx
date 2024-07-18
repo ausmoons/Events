@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { CustomEvent } from '../types/CustomEvent';
 
 interface EventListProps {
@@ -36,4 +36,4 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
     );
 };
 
-export default EventList;
+export default memo(EventList);

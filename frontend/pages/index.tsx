@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import EventsPage from './events';
 
 const IndexPage = () => {
@@ -10,4 +10,4 @@ const IndexPage = () => {
   );
 };
 
-export default IndexPage;
+export default memo(IndexPage);

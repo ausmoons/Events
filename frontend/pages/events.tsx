@@ -1,7 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import AddEventModal from '../components/AddEventModal';
-import EventList from '../components/EventList';
 import { CustomEvent } from '../types/CustomEvent';
+import dynamic from 'next/dynamic';
+
+const EventList = dynamic(() => import('../components/EventList'), {
+  loading: () => <p>Loading events...</p>,
+});
 
 const EventsPage = () => {
   const [allEvents, setAllEvents] = useState<CustomEvent[]>([]);
@@ -178,9 +182,9 @@ const EventsPage = () => {
           {error && <div className="text-red-500 mt-2">{error}</div>}
         </div>
       )}
-      <EventList events={filteredEvents} />
+      {loading ? <p>Loading events...</p> : EventList && <EventList events={filteredEvents} />}
     </div>
   );
 };
 
-export default EventsPage;
+export default memo(EventsPage);

@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { memo } from 'react';
 import AddEventForm from './AddEventForm';
 
 interface AddEventModalProps {
   onClose: () => void;
-  onAddEvent: (event: Omit<Event, 'id'>) => void;
+  onAddEvent: (event: Omit<CustomEvent, 'id'>) => void;
 }
 
 const AddEventModal: React.FC<AddEventModalProps> = ({
@@ -30,4 +30,4 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
   );
 };
 
-export default AddEventModal;
+export default memo(AddEventModal);

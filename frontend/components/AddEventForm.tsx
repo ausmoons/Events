@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { users, repositories } from '../data/hardcodedData';
-import { Event } from '../types/CustomEvent';
+import { CustomEvent } from '../types/CustomEvent';
 
 interface AddEventFormProps {
   onClose: () => void;
-  onAddEvent: (event: Omit<Event, 'id'>) => void;
+  onAddEvent: (event: Omit<CustomEvent, 'id'>) => void;
 }
 
 const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, onAddEvent }) => {
-  const [newEvent, setNewEvent] = useState<Omit<Event, 'id'>>({
+  const [newEvent, setNewEvent] = useState<Omit<CustomEvent, 'id'>>({
     type: '',
     public: false,
     repo_id: 0,
@@ -151,4 +151,4 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, onAddEvent }) => {
   );
 };
 
-export default AddEventForm;
+export default memo(AddEventForm);

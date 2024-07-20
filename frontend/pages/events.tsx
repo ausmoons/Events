@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo } from 'react';
+import React, { useEffect, useState, memo, useCallback, useMemo } from 'react';
 import AddEventModal from '../components/AddEventModal';
 import { CustomEvent } from '../types/CustomEvent';
 import dynamic from 'next/dynamic';
@@ -7,7 +7,7 @@ const EventList = dynamic(() => import('../components/EventList'), {
   loading: () => <p>Loading events...</p>,
 });
 
-const EventsPage = () => {
+const EventsPage: React.FC = () => {
   const [allEvents, setAllEvents] = useState<CustomEvent[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<CustomEvent[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -16,25 +16,25 @@ const EventsPage = () => {
   const [filterValue, setFilterValue] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
-  const fetchEvents = async (url: string, isInitialFetch = false) => {
+  const fetchEvents = useCallback(async (url: string, isInitialFetch = false) => {
+    setLoading(true);
     try {
       const response = await fetch(url);
       const data = await response.json();
-
       if (isInitialFetch) {
         setAllEvents(data);
       }
       setFilteredEvents(data);
-      setLoading(false);
     } catch (fetchError) {
-      setLoading(false);
       console.error('Error fetching events:', fetchError);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchEvents('http://localhost:8000/events/', true);
-  }, []);
+  }, [fetchEvents]);
 
   useEffect(() => {
     if (!filterType || filterValue === '') {
@@ -49,16 +49,14 @@ const EventsPage = () => {
     } else if (filterType === 'repo') {
       url = `http://localhost:8000/repos/${filterValue}/events/`;
     } else if (filterType === 'type') {
-      setFilteredEvents(
-        allEvents.filter((event) => event.type === filterValue),
-      );
+      setFilteredEvents(allEvents.filter((event) => event.type === filterValue));
       return;
     }
 
     if (url) {
       fetchEvents(url);
     }
-  }, [filterType, filterValue, allEvents]);
+  }, [filterType, filterValue, allEvents, fetchEvents]);
 
   const handleFilterTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFilterType(e.target.value);
@@ -66,9 +64,7 @@ const EventsPage = () => {
     setError(null);
   };
 
-  const handleFilterValueChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
+  const handleFilterValueChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const value = e.target.value;
     setError(null);
 
@@ -78,10 +74,7 @@ const EventsPage = () => {
       return;
     }
 
-    if (
-      (filterType === 'user' || filterType === 'repo') &&
-      isNaN(Number(value))
-    ) {
+    if ((filterType === 'user' || filterType === 'repo') && isNaN(Number(value))) {
       setError('Repo ID and User ID must be numbers.');
       setFilteredEvents(allEvents);
       return;
@@ -107,16 +100,14 @@ const EventsPage = () => {
       }
 
       const createdEvent = await response.json();
-      setAllEvents([...allEvents, createdEvent]);
-      setFilteredEvents([...allEvents, createdEvent]);
+      setAllEvents((prevEvents) => [...prevEvents, createdEvent]);
+      setFilteredEvents((prevEvents) => [...prevEvents, createdEvent]);
     } catch (addEventError) {
       console.error('Error creating event:', addEventError);
     }
   };
 
-  if (loading) {
-    return <div className="text-center text-gray-700">Loading...</div>;
-  }
+  const filteredEventList = useMemo(() => <EventList events={filteredEvents} />, [filteredEvents]);
 
   return (
     <div className="container mx-auto p-4">
@@ -182,7 +173,7 @@ const EventsPage = () => {
           {error && <div className="text-red-500 mt-2">{error}</div>}
         </div>
       )}
-      {loading ? <p>Loading events...</p> : EventList && <EventList events={filteredEvents} />}
+      {loading ? <p>Loading events...</p> : filteredEventList}
     </div>
   );
 };

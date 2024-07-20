@@ -1,6 +1,7 @@
 import React, { useState, memo } from 'react';
 import { users, repositories } from '../data/hardcodedData';
 import { CustomEvent } from '../types/CustomEvent';
+import Button from './global/button';
 
 interface AddEventFormProps {
   onClose: () => void;
@@ -132,20 +133,8 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, onAddEvent }) => {
         </div>
       )}
       <div className="flex justify-end">
-        <button
-          type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 mr-2"
-          data-cy="submit-button"
-        >
-          Add Event
-        </button>
-        <button
-          type="button"
-          className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600"
-          onClick={onClose}
-        >
-          Close
-        </button>
+        <Button title='Add Event' onClick={() => handleSubmit} dataCy='submit-button' className='mb-4 bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800'></Button>
+        <Button title='Close' onClick={onClose} className='mb-4 bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600'></Button>
       </div>
     </form>
   );

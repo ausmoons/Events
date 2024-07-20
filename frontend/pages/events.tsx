@@ -3,6 +3,7 @@ import AddEventModal from '../components/AddEventModal';
 import { CustomEvent } from '../types/CustomEvent';
 import dynamic from 'next/dynamic';
 import FilterForm from '../components/FilterForm';
+import Button from '../components/global/button';
 
 const EventList = dynamic(() => import('../components/EventList'), {
   loading: () => <p>Loading events...</p>,
@@ -113,13 +114,7 @@ const EventsPage: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Events</h1>
-      <button
-        data-cy="add-event-button"
-        className="mb-4 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-        onClick={() => setShowModal(true)}
-      >
-        Add Event
-      </button>
+      <Button title='Add Event' dataCy='add-event-button' onClick={() => setShowModal(true)} className='mb-4 bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800'></Button>
       {showModal && (
         <AddEventModal
           onClose={() => setShowModal(false)}

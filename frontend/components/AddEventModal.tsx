@@ -1,15 +1,13 @@
 import React, { memo } from 'react';
 import AddEventForm from './AddEventForm';
+import { CustomEvent } from '../types/CustomEvent';
 
 interface AddEventModalProps {
   onClose: () => void;
   onAddEvent: (event: Omit<CustomEvent, 'id'>) => void;
 }
 
-const AddEventModal: React.FC<AddEventModalProps> = ({
-  onClose,
-  onAddEvent,
-}) => {
+const AddEventModal: React.FC<AddEventModalProps> = ({ onClose, onAddEvent }) => {
   return (
     <div
       data-cy="add-event-modal"

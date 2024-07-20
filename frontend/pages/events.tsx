@@ -2,6 +2,7 @@ import React, { useEffect, useState, memo, useCallback, useMemo } from 'react';
 import AddEventModal from '../components/AddEventModal';
 import { CustomEvent } from '../types/CustomEvent';
 import dynamic from 'next/dynamic';
+import FilterForm from '../components/FilterForm';
 
 const EventList = dynamic(() => import('../components/EventList'), {
   loading: () => <p>Loading events...</p>,
@@ -114,7 +115,7 @@ const EventsPage: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4">Events</h1>
       <button
         data-cy="add-event-button"
-        className="mb-4 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+        className="mb-4 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-600"
         onClick={() => setShowModal(true)}
       >
         Add Event
@@ -125,54 +126,13 @@ const EventsPage: React.FC = () => {
           onAddEvent={handleAddEvent}
         />
       )}
-      <div className="mb-4">
-        <label htmlFor="filterType" className="block text-gray-700 mb-2">
-          Filter by:
-        </label>
-        <select
-          data-cy="filter-type-select"
-          id="filterType"
-          value={filterType}
-          onChange={handleFilterTypeChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500"
-        >
-          <option value="">All</option>
-          <option value="type">Event Type</option>
-          <option value="user">User ID</option>
-          <option value="repo">Repo ID</option>
-        </select>
-      </div>
-      {filterType && (
-        <div className="mb-4">
-          <label htmlFor="filterValue" className="block text-gray-700 mb-2">
-            {`Enter ${filterType === 'type' ? 'Event Type' : filterType === 'user' ? 'User ID' : 'Repo ID'}`}
-          </label>
-          {filterType === 'type' ? (
-            <select
-              data-cy="filter-value-select"
-              id="filterValue"
-              value={filterValue}
-              onChange={handleFilterValueChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500"
-            >
-              <option value="">Select event type</option>
-              <option value="PushEvent">PushEvent</option>
-              <option value="ReleaseEvent">ReleaseEvent</option>
-              <option value="WatchEvent">WatchEvent</option>
-            </select>
-          ) : (
-            <input
-              data-cy="filter-value-input"
-              type="text"
-              id="filterValue"
-              value={filterValue}
-              onChange={handleFilterValueChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-indigo-500"
-            />
-          )}
-          {error && <div className="text-red-500 mt-2">{error}</div>}
-        </div>
-      )}
+      <FilterForm
+        filterType={filterType}
+        filterValue={filterValue}
+        onFilterTypeChange={handleFilterTypeChange}
+        onFilterValueChange={handleFilterValueChange}
+        error={error}
+      />
       {loading ? <p>Loading events...</p> : filteredEventList}
     </div>
   );

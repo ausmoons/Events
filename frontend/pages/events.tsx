@@ -1,14 +1,16 @@
 import React, { useState, useMemo, useCallback, useEffect, memo } from 'react';
 import { GetServerSideProps } from 'next';
-import ModalWrapper from '../components/global/modalWrapper';
+import ModalWrapper from '../components/global/ModalWrapper';
 import AddEventForm from '../components/AddEventForm';
 import { CustomEvent } from '../types/CustomEvent';
 import dynamic from 'next/dynamic';
-import FilterForm from '../components/FilterForm';
 import Button from '../components/global/Button';
+import { fetchEvents as fetchEventsService, addEvent as addEventService } from '../services/eventService';
+import EventFilter from '../components/EventFilter';
+import Loading from '../components/global/Loading';
 
 const EventList = dynamic(() => import('../components/EventList'), {
-  loading: () => <p>Loading events...</p>,
+  loading: () => <Loading />,
 });
 
 interface EventsPageProps {
@@ -21,18 +23,12 @@ const EventsPage: React.FC<EventsPageProps> = ({ initialEvents, error }) => {
   const [filteredEvents, setFilteredEvents] = useState<CustomEvent[]>(initialEvents);
   const [loading, setLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [filterType, setFilterType] = useState<string>('');
-  const [filterValue, setFilterValue] = useState<string>('');
   const [fetchError, setFetchError] = useState<string | null>(error || null);
 
-  const fetchEvents = useCallback(async (url: string) => {
+  const fetchEvents = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch events, status: ${response.status}`);
-      }
-      const data = await response.json();
+      const data = await fetchEventsService();
       setAllEvents(data);
       setFilteredEvents(data);
     } catch (fetchError) {
@@ -44,64 +40,21 @@ const EventsPage: React.FC<EventsPageProps> = ({ initialEvents, error }) => {
   }, []);
 
   useEffect(() => {
-    if (error) {
-      setFetchError(error);
-    } else {
-      fetchEvents('http://localhost:8000/events/');
+    if (!error) {
+      fetchEvents();
     }
   }, [error, fetchEvents]);
 
-  useEffect(() => {
-    if (!filterType || filterValue === '') {
-      setFilteredEvents(allEvents);
-      return;
-    }
-
-    let filtered = allEvents;
-
-    if (filterType === 'type') {
-      filtered = allEvents.filter((event) => event.type === filterValue);
-    } else if (filterType === 'user') {
-      filtered = allEvents.filter((event) => event.actor_id === Number(filterValue));
-    } else if (filterType === 'repo') {
-      filtered = allEvents.filter((event) => event.repo_id === Number(filterValue));
-    }
-
-    setFilteredEvents(filtered);
-  }, [filterType, filterValue, allEvents]);
-
-  const handleFilterTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilterType(e.target.value);
-    setFilterValue('');
-    setFetchError(null);
-  };
-
-  const handleFilterValueChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFilterValue(e.target.value);
-    setFetchError(null);
-  };
-
   const handleAddEvent = async (newEvent: Omit<CustomEvent, 'id'>) => {
+    setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/events/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newEvent),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Error:', errorData.error || 'Failed to create event');
-        return;
-      }
-
-      const createdEvent = await response.json();
+      const createdEvent = await addEventService(newEvent);
       setAllEvents((prevEvents) => [...prevEvents, createdEvent]);
       setFilteredEvents((prevEvents) => [...prevEvents, createdEvent]);
     } catch (addEventError) {
       console.error('Error creating event:', addEventError);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -120,26 +73,15 @@ const EventsPage: React.FC<EventsPageProps> = ({ initialEvents, error }) => {
           childProps={{ onAddEvent: handleAddEvent }}
         />
       )}
-      <FilterForm
-        filterType={filterType}
-        filterValue={filterValue}
-        onFilterTypeChange={handleFilterTypeChange}
-        onFilterValueChange={handleFilterValueChange}
-        error={fetchError}
-      />
-      {loading ? <p>Loading events...</p> : filteredEventList}
+      <EventFilter allEvents={allEvents} onFilterChange={setFilteredEvents} error={fetchError} />
+      {loading ? <Loading /> : filteredEventList}
     </div>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
-    const res = await fetch('http://localhost:8000/events/');
-    if (!res.ok) {
-      throw new Error(`Failed to fetch events, received status ${res.status}`);
-    }
-    const initialEvents: CustomEvent[] = await res.json();
-
+    const initialEvents = await fetchEventsService();
     return {
       props: {
         initialEvents,

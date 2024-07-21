@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "types": [
+      "cypress",
+      "node"
+    ],
     "target": "esnext",
     "lib": [
       "dom",
@@ -28,6 +32,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "cypress.config.ts",
     ".eslintrc.js"
   ],
   "exclude": [

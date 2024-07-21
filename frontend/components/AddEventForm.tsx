@@ -14,7 +14,7 @@ interface AddEventFormProps {
 const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, onAddEvent }) => {
   const [newEvent, setNewEvent] = useState<Omit<CustomEvent, 'id'>>({
     type: '',
-    public: false,
+    public: true,
     repo_id: 0,
     actor_id: 0,
   });
@@ -101,6 +101,7 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, onAddEvent }) => {
           onChange={handleInputChange}
           className="mt-1 block w-full focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           dataCy="repo-id-input"
+          min="0"
         />
       </Label>
       <Label labelText="Actor ID:" htmlFor="actor-id-input">
@@ -112,6 +113,7 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, onAddEvent }) => {
           onChange={handleInputChange}
           className="mt-1 block w-full focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           dataCy="actor-id-input"
+          min="0"
         />
       </Label>
       {error && (
@@ -119,7 +121,7 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, onAddEvent }) => {
           {error}
         </div>
       )}
-      <div className="flex justify-end">
+      <div className="flex justify-end space-x-2">
         <Button
           title="Add Event"
           onClick={() => handleSubmit}

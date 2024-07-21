@@ -1,9 +1,14 @@
-# Test Assignment: CRUD App development
+# CRUD App development
 
 ## Objective
 
 Develop a RESTful service to manage a collection of event records. The service must support Create, Read, and Query operations for event data.
 On top of that, in part 2, create a small frontend app to read and wrote this data.
+
+## Instructions on how to run the project
+
+To test the application from events folder run `python manage.py runserver`. You can run test by `python manage.py test app`. To see the admin view -`python manage.py createsuperuser`, `http://localhost:8000/admin/`.
+To run frontend go to `cd .\frontend\` , after run `npm run dev`. Tests can be used by running `npx cypress open`. 
 
 ## Environment:
 
@@ -98,6 +103,3 @@ Example of an event data JSON object:
 
 - **Description:** Retrieves all events related to the specified repository.
 - **Response:** Status `200` with an array of events related to the repository ordered by their `id` in ascending order.
-
-To test the application from events folder run python manage.py runserver. You can run test by python manage.py test app . 
-To run frontend go to cd .\frontend\ , after run npm run dev. Tests can be used by running npx cypress open

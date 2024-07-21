@@ -2,7 +2,7 @@ describe('AddEventModal', () => {
   beforeEach(() => {
     cy.visit('/events');
     cy.get('[data-cy=add-event-button]').click();
-    cy.get('[data-cy=add-event-modal]', { timeout: 10000 }).should(
+    cy.get('[data-cy=generic-modal]', { timeout: 10000 }).should(
       'be.visible',
     );
   });
@@ -41,7 +41,7 @@ describe('AddEventModal', () => {
     cy.get('[data-cy=actor-id-input]').type('1');
     cy.get('[data-cy=submit-button]').click();
 
-    cy.get('[data-cy=add-event-modal]', { timeout: 10000 }).should('not.exist');
+    cy.get('[data-cy=generic-modal]', { timeout: 10000 }).should('not.exist');
     cy.contains('PushEvent').should('be.visible');
   });
 });

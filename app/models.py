@@ -3,9 +3,9 @@ from django.db import models
 
 class Event(models.Model):
     EVENT_TYPES = [
-        ('PushEvent', 'PushEvent'),
-        ('ReleaseEvent', 'ReleaseEvent'),
-        ('WatchEvent', 'WatchEvent'),
+        ("PushEvent", "PushEvent"),
+        ("ReleaseEvent", "ReleaseEvent"),
+        ("WatchEvent", "WatchEvent"),
     ]
 
     type = models.CharField(max_length=100, choices=EVENT_TYPES)

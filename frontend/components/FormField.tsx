@@ -1,4 +1,6 @@
 import React, { memo } from 'react';
+import Input from './global/Input';
+import Select from './global/Select';
 
 interface FormFieldProps {
   label: string;
@@ -26,29 +28,23 @@ const FormField: React.FC<FormFieldProps> = ({
       <label className="block text-gray-700">
         {label}:
         {type === 'select' ? (
-          <select
+          <Select
+            id={name}
             name={name}
             value={value}
             onChange={onChange}
-            required={required}
+            options={options}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          >
-            <option value="">Select {label.toLowerCase()}</option>
-            {options?.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            required={required}
+          />
         ) : (
-          <input
+          <Input
             type={type}
             name={name}
             value={value}
             onChange={onChange}
             required={required}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          />
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
         )}
       </label>
     </div>

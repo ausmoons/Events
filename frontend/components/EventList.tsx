@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { CustomEvent } from '../types/CustomEvent';
+import Details from './global/Detail';
 
 interface EventListProps {
     events?: CustomEvent[];
@@ -18,18 +19,10 @@ const EventList: React.FC<EventListProps> = ({ events = [] }) => {
         <ul className="space-y-4">
             {events.map((event) => (
                 <li key={event.id} data-cy="event-item" className="p-4 bg-white rounded-md shadow-md">
-                    <div>
-                        <strong>Type:</strong> {event.type}
-                    </div>
-                    <div>
-                        <strong>Public:</strong> {event.public ? 'Yes' : 'No'}
-                    </div>
-                    <div>
-                        <strong>Repo ID:</strong> {event.repo_id}
-                    </div>
-                    <div>
-                        <strong>Actor ID:</strong> {event.actor_id}
-                    </div>
+                    <Details label="Type" value={event.type} />
+                    <Details label="Public" value={event.public} />
+                    <Details label="Repo ID" value={event.repo_id} />
+                    <Details label="Actor ID" value={event.actor_id} />
                 </li>
             ))}
         </ul>

@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useCallback, useEffect, memo } from 'react';
 import { GetServerSideProps } from 'next';
-import AddEventModal from '../components/AddEventModal';
+import ModalWrapper from '../components/global/modalWrapper';
+import AddEventForm from '../components/AddEventForm';
 import { CustomEvent } from '../types/CustomEvent';
 import dynamic from 'next/dynamic';
 import FilterForm from '../components/FilterForm';
-import Button from '../components/global/button';
+import Button from '../components/global/Button';
 
 const EventList = dynamic(() => import('../components/EventList'), {
   loading: () => <p>Loading events...</p>,
@@ -112,9 +113,11 @@ const EventsPage: React.FC<EventsPageProps> = ({ initialEvents, error }) => {
       {fetchError && <p className="text-red-500">{fetchError}</p>}
       <Button title='Add Event' dataCy='add-event-button' onClick={() => setShowModal(true)} className='mb-4 bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800' />
       {showModal && (
-        <AddEventModal
+        <ModalWrapper
           onClose={() => setShowModal(false)}
-          onAddEvent={handleAddEvent}
+          title="Add New Event"
+          childComponent={AddEventForm}
+          childProps={{ onAddEvent: handleAddEvent }}
         />
       )}
       <FilterForm

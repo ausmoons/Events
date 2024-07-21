@@ -2,9 +2,7 @@ describe('AddEventModal', () => {
   beforeEach(() => {
     cy.visit('/events');
     cy.get('[data-cy=add-event-button]').click();
-    cy.get('[data-cy=generic-modal]', { timeout: 10000 }).should(
-      'be.visible',
-    );
+    cy.get('[data-cy=generic-modal]', { timeout: 10000 }).should('be.visible');
   });
 
   it('should display validation errors when required fields are missing', () => {

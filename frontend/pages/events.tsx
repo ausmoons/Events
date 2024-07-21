@@ -19,7 +19,8 @@ interface EventsPageProps {
 
 const EventsPage: React.FC<EventsPageProps> = ({ initialEvents, error }) => {
   const [allEvents, setAllEvents] = useState<CustomEvent[]>(initialEvents);
-  const [filteredEvents, setFilteredEvents] = useState<CustomEvent[]>(initialEvents);
+  const [filteredEvents, setFilteredEvents] =
+    useState<CustomEvent[]>(initialEvents);
   const [loading, setLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [fetchError, setFetchError] = useState<string | null>(error || null);
@@ -64,14 +65,20 @@ const EventsPage: React.FC<EventsPageProps> = ({ initialEvents, error }) => {
     }
   };
 
-  const filteredEventList = useMemo(() => <EventList events={filteredEvents} />, [filteredEvents]);
+  const filteredEventList = useMemo(
+    () => <EventList events={filteredEvents} />,
+    [filteredEvents]
+  );
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Events</h1>
       {fetchError && <p className="text-red-500">{fetchError}</p>}
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <div
+          className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
+          role="alert"
+        >
           <strong className="font-bold">Success!</strong>
           <span className="block sm:inline"> {successMessage}</span>
         </div>

@@ -28,11 +28,11 @@ const EventFilter: React.FC<EventFilterProps> = ({
       filtered = allEvents.filter((event) => event.type === filterValue);
     } else if (filterType === 'user') {
       filtered = allEvents.filter(
-        (event) => event.actor_id === Number(filterValue),
+        (event) => event.actor_id === Number(filterValue)
       );
     } else if (filterType === 'repo') {
       filtered = allEvents.filter(
-        (event) => event.repo_id === Number(filterValue),
+        (event) => event.repo_id === Number(filterValue)
       );
     }
 
@@ -45,7 +45,7 @@ const EventFilter: React.FC<EventFilterProps> = ({
   };
 
   const handleFilterValueChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setFilterValue(e.target.value);
   };

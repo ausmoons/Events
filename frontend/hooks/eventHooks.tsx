@@ -30,7 +30,7 @@ export const useFetchEvents = (initialUrl: string) => {
 export const useFilteredEvents = (
   allEvents: CustomEvent[],
   filterType: string,
-  filterValue: string,
+  filterValue: string
 ) => {
   const [filteredEvents, setFilteredEvents] = useState<CustomEvent[]>([]);
 
@@ -42,7 +42,7 @@ export const useFilteredEvents = (
 
     if (filterType === 'type') {
       setFilteredEvents(
-        allEvents.filter((event) => event.type === filterValue),
+        allEvents.filter((event) => event.type === filterValue)
       );
     }
   }, [allEvents, filterType, filterValue]);

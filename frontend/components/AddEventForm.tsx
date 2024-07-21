@@ -21,7 +21,7 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, onAddEvent }) => {
   const [error, setError] = useState<string | null>(null);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
 
@@ -51,7 +51,7 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, onAddEvent }) => {
     }
 
     const isRepoValid = repositories.some(
-      (repo) => repo.id === newEvent.repo_id,
+      (repo) => repo.id === newEvent.repo_id
     );
     const isActorValid = users.some((user) => user.id === newEvent.actor_id);
 

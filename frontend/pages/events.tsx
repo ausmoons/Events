@@ -1,11 +1,10 @@
 import React, { useState, useMemo, useCallback, useEffect, memo } from 'react';
-import { GetServerSideProps } from 'next';
 import ModalWrapper from '../components/global/ModalWrapper';
 import AddEventForm from '../components/AddEventForm';
 import { CustomEvent } from '../types/CustomEvent';
 import dynamic from 'next/dynamic';
 import Button from '../components/global/Button';
-import { fetchEvents as fetchEventsService, addEvent as addEventService } from '../services/eventService';
+import { fetchEvents, addEventService } from '../services/eventService'; // Direct import
 import EventFilter from '../components/EventFilter';
 import Loading from '../components/global/Loading';
 
@@ -20,19 +19,20 @@ interface EventsPageProps {
 
 const EventsPage: React.FC<EventsPageProps> = ({ initialEvents, error }) => {
   const [allEvents, setAllEvents] = useState<CustomEvent[]>(initialEvents);
-  const [filteredEvents, setFilteredEvents] = useState<CustomEvent[]>(initialEvents);
+  const [filteredEvents, setFilteredEvents] =
+    useState<CustomEvent[]>(initialEvents);
   const [loading, setLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [fetchError, setFetchError] = useState<string | null>(error || null);
 
-  const fetchEvents = useCallback(async () => {
+  const fetchEventsData = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await fetchEventsService();
+      const data = await fetchEvents();
       setAllEvents(data);
       setFilteredEvents(data);
-    } catch (fetchError) {
-      console.error('Error fetching events:', fetchError);
+    } catch (fetchEventsError) {
+      console.error('Error fetching events:', fetchEventsError);
       setFetchError('Failed to fetch events');
     } finally {
       setLoading(false);
@@ -41,9 +41,9 @@ const EventsPage: React.FC<EventsPageProps> = ({ initialEvents, error }) => {
 
   useEffect(() => {
     if (!error) {
-      fetchEvents();
+      fetchEventsData();
     }
-  }, [error, fetchEvents]);
+  }, [error, fetchEventsData]);
 
   const handleAddEvent = async (newEvent: Omit<CustomEvent, 'id'>) => {
     setLoading(true);
@@ -58,13 +58,21 @@ const EventsPage: React.FC<EventsPageProps> = ({ initialEvents, error }) => {
     }
   };
 
-  const filteredEventList = useMemo(() => <EventList events={filteredEvents} />, [filteredEvents]);
+  const filteredEventList = useMemo(
+    () => <EventList events={filteredEvents} />,
+    [filteredEvents],
+  );
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Events</h1>
       {fetchError && <p className="text-red-500">{fetchError}</p>}
-      <Button title='Add Event' dataCy='add-event-button' onClick={() => setShowModal(true)} className='mb-4 bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800' />
+      <Button
+        title="Add Event"
+        dataCy="add-event-button"
+        onClick={() => setShowModal(true)}
+        className="mb-4 bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800"
+      />
       {showModal && (
         <ModalWrapper
           onClose={() => setShowModal(false)}
@@ -73,35 +81,14 @@ const EventsPage: React.FC<EventsPageProps> = ({ initialEvents, error }) => {
           childProps={{ onAddEvent: handleAddEvent }}
         />
       )}
-      <EventFilter allEvents={allEvents} onFilterChange={setFilteredEvents} error={fetchError} />
+      <EventFilter
+        allEvents={allEvents}
+        onFilterChange={setFilteredEvents}
+        error={fetchError}
+      />
       {loading ? <Loading /> : filteredEventList}
     </div>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  try {
-    const initialEvents = await fetchEventsService();
-    return {
-      props: {
-        initialEvents,
-      },
-    };
-  } catch (error) {
-    console.error('Error fetching events:', error);
-
-    let errorMessage = 'Failed to load events';
-    if (error instanceof Error) {
-      errorMessage = error.message;
-    }
-
-    return {
-      props: {
-        initialEvents: [],
-        error: errorMessage,
-      },
-    };
-  }
 };
 
 export default memo(EventsPage);

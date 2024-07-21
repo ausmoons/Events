@@ -77,7 +77,7 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, onAddEvent }) => {
           name="type"
           value={newEvent.type}
           onChange={handleInputChange}
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          className="mt-1 block border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           dataCy="type-select"
         />
       </Label>
@@ -99,7 +99,7 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, onAddEvent }) => {
           name="repo_id"
           value={newEvent.repo_id}
           onChange={handleInputChange}
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          className="mt-1 block w-full focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           dataCy="repo-id-input"
         />
       </Label>
@@ -110,7 +110,7 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, onAddEvent }) => {
           name="actor_id"
           value={newEvent.actor_id}
           onChange={handleInputChange}
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          className="mt-1 block w-full focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           dataCy="actor-id-input"
         />
       </Label>
@@ -120,8 +120,17 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ onClose, onAddEvent }) => {
         </div>
       )}
       <div className="flex justify-end">
-        <Button title='Add Event' onClick={() => handleSubmit} dataCy='submit-button' className='mb-4 bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800' type='submit'></Button>
-        <Button title='Close' onClick={onClose} className='mb-4 bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600'></Button>
+        <Button
+          title="Add Event"
+          onClick={() => handleSubmit}
+          dataCy="submit-button"
+          className="mb-4 bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800"
+        ></Button>
+        <Button
+          title="Close"
+          onClick={onClose}
+          className="mb-4 bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600"
+        ></Button>
       </div>
     </form>
   );

@@ -1,19 +1,27 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, memo } from 'react';
 
 interface LabelProps {
-    labelText: string;
-    htmlFor: string;
-    children?: ReactNode;
-    className?: string;
+  labelText: string;
+  htmlFor: string;
+  children?: ReactNode;
+  className?: string;
 }
 
-const Label: React.FC<LabelProps> = ({ labelText, htmlFor, children, className }) => {
-    return (
-        <label htmlFor={htmlFor} className={`block text-gray-700 mb-4 ${className}`}>
-            {labelText}
-            {children}
-        </label>
-    );
+const Label: React.FC<LabelProps> = ({
+  labelText,
+  htmlFor,
+  children,
+  className,
+}) => {
+  return (
+    <label
+      htmlFor={htmlFor}
+      className={`block text-gray-700 mb-4 ${className}`}
+    >
+      {labelText}
+      {children}
+    </label>
+  );
 };
 
-export default Label;
+export default memo(Label);

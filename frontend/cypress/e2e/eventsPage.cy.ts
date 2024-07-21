@@ -95,7 +95,9 @@ describe('Events Page', () => {
       cy.log('Response:', interception.response);
     });
     cy.get('[data-cy=event-item]').should('have.length', 0);
-    cy.contains('No events found for the selected filter.').should('be.visible');
+    cy.contains('No events found for the selected filter.').should(
+      'be.visible',
+    );
   });
 
   it('should display all events when filter is cleared', () => {

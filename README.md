@@ -99,19 +99,5 @@ Example of an event data JSON object:
 - **Description:** Retrieves all events related to the specified repository.
 - **Response:** Status `200` with an array of events related to the repository ordered by their `id` in ascending order.
 
-## Specifications for the frontend
-
-- You need to create a simple Next.js application which interacts with your api.
-- In the app, you have list of events and their properties
-- You can submit an event and if it is valid, then it immediately shows in the list of events. If the event is not valid, an error message shows.
-  - You can hardcode couple of users in the frontend application with their details and respective integer ids
-  - You can hardcode the repos in you frontend application with some mock details and respective ids.
-- You can filter the list of events by the event type.
-
-## Implementation Notes
-
-- Ensure the API follows REST principles.
-- Handle invalid input gracefully with appropriate HTTP status codes.
-- Maintain clear and organized code to allow easy review and testing.
-
-This task will be evaluated based on the correctness, code quality, and adherence to the provided specifications. Good luck!
+To test the application from events folder run python manage.py runserver. You can run test by python manage.py test app . 
+To run frontend go to cd .\frontend\ , after run npm run dev. Tests can be used by running npx cypress open

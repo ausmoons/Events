@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 const Loading: React.FC = () => {
-    return <p>Loading...</p>;
+  return <p>Loading...</p>;
 };
 
-export default Loading;
+export default memo(Loading);

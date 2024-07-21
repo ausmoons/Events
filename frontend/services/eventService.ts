@@ -1,6 +1,7 @@
 import { CustomEvent } from '../types/CustomEvent';
 
-const API_URL = 'http://localhost:8000/events/';
+const backendUrl = 'http://localhost:8000';
+const API_URL = `${backendUrl}/events/`;
 
 export const fetchEvents = async (): Promise<CustomEvent[]> => {
   const response = await fetch(API_URL);
@@ -27,4 +28,36 @@ export const addEventService = async (
   }
 
   return response.json();
+};
+
+export const fetchFilteredEvents = async (type: string, value: string): Promise<CustomEvent[]> => {
+  try {
+    let url = `${backendUrl}/events/`;
+    if (type && value) {
+      if (type === 'user') {
+        url = `${backendUrl}/users/${value}/events/`;
+      } else if (type === 'repo') {
+        url = `${backendUrl}/repos/${value}/events/`;
+      } else {
+        url += `?${type}=${value}`;
+      }
+    }
+    const response = await fetch(url);
+    const contentType = response.headers.get("content-type");
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      return await response.json();
+    } else {
+      const text = await response.text();
+      console.error('Unexpected response format:', text);
+      throw new Error('Unexpected response format');
+    }
+  } catch (error) {
+    console.error('Error fetching filtered events:', error);
+    throw error;
+  }
 };

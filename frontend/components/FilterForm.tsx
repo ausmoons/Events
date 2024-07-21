@@ -33,7 +33,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
       {filterType && (
         <div className="mb-4">
           <label htmlFor="filterValue" className="block text-gray-700 mb-2">
-            {`Enter ${filterType === 'type' ? 'Event Type' : filterType === 'user' ? 'User ID' : 'Repo ID'}`}
+            {`Enter ${filterType === 'type' ? 'Event Type' : filterType === 'user' ? 'Actor ID' : 'Repo ID'}`}
           </label>
           {filterType === 'type' ? (
             <EventSelector

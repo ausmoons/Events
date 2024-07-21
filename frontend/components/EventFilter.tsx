@@ -1,15 +1,14 @@
 import React, { useState, useEffect, ChangeEvent, memo } from 'react';
 import { CustomEvent } from '../types/CustomEvent';
 import FilterForm from './FilterForm';
+import { fetchFilteredEvents } from '../services/eventService';
 
 interface EventFilterProps {
-  allEvents: CustomEvent[];
   onFilterChange: (filteredEvents: CustomEvent[]) => void;
   error?: string | null;
 }
 
 const EventFilter: React.FC<EventFilterProps> = ({
-  allEvents,
   onFilterChange,
   error = null,
 }) => {
@@ -17,27 +16,16 @@ const EventFilter: React.FC<EventFilterProps> = ({
   const [filterValue, setFilterValue] = useState<string>('');
 
   useEffect(() => {
-    if (!filterType || filterValue === '') {
-      onFilterChange(allEvents);
-      return;
-    }
-
-    let filtered = allEvents;
-
-    if (filterType === 'type') {
-      filtered = allEvents.filter((event) => event.type === filterValue);
-    } else if (filterType === 'user') {
-      filtered = allEvents.filter(
-        (event) => event.actor_id === Number(filterValue)
-      );
-    } else if (filterType === 'repo') {
-      filtered = allEvents.filter(
-        (event) => event.repo_id === Number(filterValue)
-      );
-    }
-
-    onFilterChange(filtered);
-  }, [filterType, filterValue, allEvents, onFilterChange]);
+    const fetchData = async () => {
+      try {
+        const data = await fetchFilteredEvents(filterType, filterValue);
+        onFilterChange(data);
+      } catch (error) {
+        console.error('Error fetching filtered events:', error);
+      }
+    };
+    fetchData();
+  }, [filterType, filterValue, onFilterChange]);
 
   const handleFilterTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setFilterType(e.target.value);

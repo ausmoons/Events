@@ -13,7 +13,7 @@ interface FilterTypeSelectorProps {
 const filterTypeOptions = [
   { value: '', label: 'All' },
   { value: 'type', label: 'Event Type' },
-  { value: 'user', label: 'User ID' },
+  { value: 'user', label: 'Actor ID' },
   { value: 'repo', label: 'Repo ID' },
 ];
 

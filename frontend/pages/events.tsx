@@ -1,4 +1,5 @@
-import React, { useEffect, useState, memo, useCallback, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, memo } from 'react';
+import { GetServerSideProps } from 'next';
 import AddEventModal from '../components/AddEventModal';
 import { CustomEvent } from '../types/CustomEvent';
 import dynamic from 'next/dynamic';
@@ -9,80 +10,74 @@ const EventList = dynamic(() => import('../components/EventList'), {
   loading: () => <p>Loading events...</p>,
 });
 
-const EventsPage: React.FC = () => {
-  const [allEvents, setAllEvents] = useState<CustomEvent[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<CustomEvent[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+interface EventsPageProps {
+  initialEvents: CustomEvent[];
+  error?: string;
+}
+
+const EventsPage: React.FC<EventsPageProps> = ({ initialEvents, error }) => {
+  const [allEvents, setAllEvents] = useState<CustomEvent[]>(initialEvents);
+  const [filteredEvents, setFilteredEvents] = useState<CustomEvent[]>(initialEvents);
+  const [loading, setLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [filterType, setFilterType] = useState<string>('');
   const [filterValue, setFilterValue] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(error || null);
 
-  const fetchEvents = useCallback(async (url: string, isInitialFetch = false) => {
+  const fetchEvents = useCallback(async (url: string) => {
     setLoading(true);
     try {
       const response = await fetch(url);
-      const data = await response.json();
-      if (isInitialFetch) {
-        setAllEvents(data);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch events, status: ${response.status}`);
       }
+      const data = await response.json();
+      setAllEvents(data);
       setFilteredEvents(data);
     } catch (fetchError) {
       console.error('Error fetching events:', fetchError);
+      setFetchError('Failed to fetch events');
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchEvents('http://localhost:8000/events/', true);
-  }, [fetchEvents]);
+    if (error) {
+      setFetchError(error);
+    } else {
+      fetchEvents('http://localhost:8000/events/');
+    }
+  }, [error, fetchEvents]);
 
   useEffect(() => {
     if (!filterType || filterValue === '') {
       setFilteredEvents(allEvents);
-      setError(null);
       return;
     }
 
-    let url = '';
-    if (filterType === 'user') {
-      url = `http://localhost:8000/users/${filterValue}/events/`;
+    let filtered = allEvents;
+
+    if (filterType === 'type') {
+      filtered = allEvents.filter((event) => event.type === filterValue);
+    } else if (filterType === 'user') {
+      filtered = allEvents.filter((event) => event.actor_id === Number(filterValue));
     } else if (filterType === 'repo') {
-      url = `http://localhost:8000/repos/${filterValue}/events/`;
-    } else if (filterType === 'type') {
-      setFilteredEvents(allEvents.filter((event) => event.type === filterValue));
-      return;
+      filtered = allEvents.filter((event) => event.repo_id === Number(filterValue));
     }
 
-    if (url) {
-      fetchEvents(url);
-    }
-  }, [filterType, filterValue, allEvents, fetchEvents]);
+    setFilteredEvents(filtered);
+  }, [filterType, filterValue, allEvents]);
 
   const handleFilterTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFilterType(e.target.value);
     setFilterValue('');
-    setError(null);
+    setFetchError(null);
   };
 
   const handleFilterValueChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const value = e.target.value;
-    setError(null);
-
-    if (value === '') {
-      setFilterValue('');
-      setFilteredEvents(allEvents);
-      return;
-    }
-
-    if ((filterType === 'user' || filterType === 'repo') && isNaN(Number(value))) {
-      setError('Repo ID and User ID must be numbers.');
-      setFilteredEvents(allEvents);
-      return;
-    }
-
-    setFilterValue(value);
+    setFilterValue(e.target.value);
+    setFetchError(null);
   };
 
   const handleAddEvent = async (newEvent: Omit<CustomEvent, 'id'>) => {
@@ -114,7 +109,8 @@ const EventsPage: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Events</h1>
-      <Button title='Add Event' dataCy='add-event-button' onClick={() => setShowModal(true)} className='mb-4 bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800'></Button>
+      {fetchError && <p className="text-red-500">{fetchError}</p>}
+      <Button title='Add Event' dataCy='add-event-button' onClick={() => setShowModal(true)} className='mb-4 bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-800' />
       {showModal && (
         <AddEventModal
           onClose={() => setShowModal(false)}
@@ -126,11 +122,41 @@ const EventsPage: React.FC = () => {
         filterValue={filterValue}
         onFilterTypeChange={handleFilterTypeChange}
         onFilterValueChange={handleFilterValueChange}
-        error={error}
+        error={fetchError}
       />
       {loading ? <p>Loading events...</p> : filteredEventList}
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  try {
+    const res = await fetch('http://localhost:8000/events/');
+    if (!res.ok) {
+      throw new Error(`Failed to fetch events, received status ${res.status}`);
+    }
+    const initialEvents: CustomEvent[] = await res.json();
+
+    return {
+      props: {
+        initialEvents,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching events:', error);
+
+    let errorMessage = 'Failed to load events';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
+    return {
+      props: {
+        initialEvents: [],
+        error: errorMessage,
+      },
+    };
+  }
 };
 
 export default memo(EventsPage);

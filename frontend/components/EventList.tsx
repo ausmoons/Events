@@ -2,10 +2,10 @@ import React, { memo } from 'react';
 import { CustomEvent } from '../types/CustomEvent';
 
 interface EventListProps {
-    events: CustomEvent[];
+    events?: CustomEvent[];
 }
 
-const EventList: React.FC<EventListProps> = ({ events }) => {
+const EventList: React.FC<EventListProps> = ({ events = [] }) => {
     if (events.length === 0) {
         return (
             <div className="text-center text-gray-700">
